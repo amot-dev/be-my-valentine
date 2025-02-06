@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Be My Valentine?</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            text-align: center;
+            font-family: Arial, sans-serif;
+            background: #ffebee;
+            color: #c62828;
+            margin: 0;
+            padding: 20px;
+            position: relative;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            position: relative;
+            width: 100%;
+        }
+        .prompt-container {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .heart {
+            font-size: 60px;
+            animation: heartbeat 1s infinite;
+            position: absolute;
+            top: -70px;
+        }
+        @keyframes heartbeat {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        .hidden {
+            display: none;
+        }
+        button {
+            padding: 12px 24px;
+            margin-top: 10px;
+            border: none;
+            background: #c62828;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        .small-btn {
+            font-size: 16px;
+            padding: 0 8px;  /* Remove vertical padding to match input height */
+            margin-left: 5px;
+            border: none;  /* Remove border */
+            background: none;  /* Remove background */
+            color: #c62828;  /* Keep the button text color */
+            cursor: pointer;
+            display: flex;
+            align-items: center;  /* Vertically align the icon */
+            justify-content: center;  /* Horizontally center the icon */
+            height: 36px;  /* Set the same height as the input field */
+        }
+        .response {
+            color: #4caf50;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        input {
+            padding: 10px;
+            border: 2px solid #c62828;
+            border-radius: 8px;
+            font-size: 16px;
+            text-align: center;
+            width: 80%;
+            max-width: 300px;
+        }
+		#questionList {
+		    display: flex;
+		    flex-direction: column;
+		    align-items: center;
+		    width: 100%;
+		}
+		.question-box {
+		    display: flex;
+		    justify-content: center;
+		    align-items: center;
+		    width: 100%;
+			font-size: 24px;
+		    margin-top: 5px;
+		}
+		.question-input {
+		    width: 80%;
+		    max-width: 300px;
+		    padding: 10px;
+		    border: 2px solid #c62828;
+		    border-radius: 8px;
+		    font-size: 16px;
+		    text-align: center;
+		}
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div id="screen1">
+            <div class="prompt-container">
+                <div class="heart">❤️</div>
+                <h1>Ask someone to be your Valentine!</h1>
+            </div>
+            <p>Enter your name and customize the questions your Valentine must answer!</p>
+            <input type="text" id="nameInput" placeholder="Your Name"><br><br><br>
+            <div id="questionList"></div>
+            <button onclick="addQuestion()">Add Question</button><br><br>
+            <button onclick="startProcess()">Next</button>
+            <p>Pass the phone to your prospective Valentine!</p>
+        </div>
+
+        <div id="screen2" class="hidden">
+            <div class="prompt-container">
+                <div class="heart">❤️</div>
+                <h1 id="message"></h1>
+            </div>
+            <button onclick="nextMessage()">Next</button>
+        </div>
+
+        <div id="screen3" class="hidden">
+            <div class="prompt-container">
+                <div class="heart">❤️</div>
+                <h1 id="yesPrompt"></h1>
+            </div>
+            <button id="recordButton" onclick="toggleRecording()">🎤 Tap to Record</button>
+            <p id="responseText" class="response hidden">Well, let's find out if you're worthy 🧐</p>
+            <button id="nextToQuestions" class="hidden" onclick="startQuestions()">Next</button>
+        </div>
+
+        <div id="screen4" class="hidden">
+            <div class="prompt-container">
+                <div class="heart">❤️</div>
+                <h1 id="questionText"></h1>
+            </div>
+            <button id="questionRecordButton" onclick="toggleQuestionRecording()">🎤 Tap to Record</button>
+            <p id="questionResponse" class="response hidden"></p>
+            <button id="nextQuestionButton" class="hidden" onclick="nextQuestion()">Next</button>
+        </div>
+
+        <div id="screen5" class="hidden">
+            <div class="prompt-container">
+                <div class="heart">❤️</div>
+                <h1>Congratulations! 🎉</h1>
+            </div>
+            <p>You are officially worthy of being my Valentine! 💖</p>
+        </div>
+    </div>
+
+<script>
+    let userName = "";
+    let questionIndex = 0;
+    let recording = false;
+    let questions = [
+        "What's your favorite thing about your Valentine?",
+        "Do you promise to share chocolates?",
+        "Will you give big hugs when needed?"
+    ];
+	const positiveResponses = [
+    	"That sounds great! 🎉",
+    	"Lovely answer! 💕",
+    	"I love that! 😊",
+    	"What a fantastic response! 🌟",
+    	"Perfect! ❤️"
+	];
+
+
+    function addQuestion(value = "") {
+        let questionList = document.getElementById("questionList");
+        let div = document.createElement("div");
+        div.classList.add("question-box");
+
+        let input = document.createElement("input");
+        input.type = "text";
+        input.value = value;
+        input.placeholder = "Enter a question";
+        input.classList.add("question-input");
+
+        let removeBtn = document.createElement("button");
+        removeBtn.innerText = "❌";
+        removeBtn.classList.add("small-btn");
+        removeBtn.onclick = function () {
+            if (questionList.children.length > 1) {
+                questionList.removeChild(div);
+            }
+        };
+
+        div.appendChild(input);
+        div.appendChild(removeBtn);
+        questionList.appendChild(div);
+    }
+
+    function startProcess() {
+        userName = document.getElementById("nameInput").value.trim();
+        if (!userName) return alert("Please enter a name!");
+
+        questions = [...document.querySelectorAll(".question-input")].map(input => input.value.trim()).filter(q => q);
+        if (questions.length === 0) return alert("Please enter at least one question!");
+
+        document.getElementById("screen1").classList.add("hidden");
+        document.getElementById("screen2").classList.remove("hidden");
+
+        document.getElementById("message").innerText = `${userName} wants you to be their Valentine. How exciting!`;
+    }
+
+    function nextMessage() {
+        document.getElementById("screen2").classList.add("hidden");
+        document.getElementById("screen3").classList.remove("hidden");
+        document.getElementById("yesPrompt").innerText = `Say "Yes" if you want to be ${userName}'s Valentine!`;
+    }
+
+    function toggleRecording() {
+        let button = document.getElementById("recordButton");
+        let responseText = document.getElementById("responseText");
+
+        if (!recording) {
+            button.innerText = "⏹️ Stop Recording";
+        } else {
+            responseText.classList.remove("hidden");
+            document.getElementById("nextToQuestions").classList.remove("hidden");
+            button.innerText = "🎤 Tap to Record";
+        }
+        recording = !recording;
+    }
+
+    function startQuestions() {
+        document.getElementById("screen3").classList.add("hidden");
+        document.getElementById("screen4").classList.remove("hidden");
+        nextQuestion();
+    }
+
+	function toggleQuestionRecording() {
+   		let button = document.getElementById("questionRecordButton");
+    	let responseText = document.getElementById("questionResponse");
+
+    	if (!recording) {
+        	button.innerText = "⏹️ Stop Recording";
+    	} else {
+        	let randomResponse = positiveResponses[Math.floor(Math.random() * positiveResponses.length)];
+        	responseText.innerText = randomResponse;
+        	responseText.classList.remove("hidden");
+        	document.getElementById("nextQuestionButton").classList.remove("hidden");
+        	button.innerText = "🎤 Tap to Record";
+    	}
+
+    	recording = !recording;
+	}
+
+    function nextQuestion() {
+        if (questionIndex < questions.length) {
+            document.getElementById("questionText").innerText = questions[questionIndex++];
+            document.getElementById("questionResponse").classList.add("hidden");
+            document.getElementById("nextQuestionButton").classList.add("hidden");
+        } else {
+            document.getElementById("screen4").classList.add("hidden");
+            document.getElementById("screen5").classList.remove("hidden");
+        }
+    }
+
+    questions.forEach(q => addQuestion(q));
+</script>
+
+</body>
+</html>

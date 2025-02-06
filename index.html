@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Be My Valentine?</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>❤️</text></svg>">
     <style>
         body {
             display: flex;
@@ -162,7 +163,7 @@
                 <div class="heart">❤️</div>
                 <h1>Congratulations! 🎉</h1>
             </div>
-            <p>You are officially worthy of being my Valentine! 💖</p>
+            <p id="worthyText"></p>
         </div>
     </div>
 
@@ -234,7 +235,8 @@
 
         if (!recording) {
             button.innerText = "⏹️ Stop Recording";
-        } else {
+        }
+        else {
             responseText.classList.remove("hidden");
             document.getElementById("nextToQuestions").classList.remove("hidden");
             button.innerText = "🎤 Tap to Record";
@@ -254,7 +256,8 @@
 
     	if (!recording) {
         	button.innerText = "⏹️ Stop Recording";
-    	} else {
+    	}
+        else {
         	let randomResponse = positiveResponses[Math.floor(Math.random() * positiveResponses.length)];
         	responseText.innerText = randomResponse;
         	responseText.classList.remove("hidden");
@@ -270,9 +273,11 @@
             document.getElementById("questionText").innerText = questions[questionIndex++];
             document.getElementById("questionResponse").classList.add("hidden");
             document.getElementById("nextQuestionButton").classList.add("hidden");
-        } else {
+        }
+        else {
             document.getElementById("screen4").classList.add("hidden");
             document.getElementById("screen5").classList.remove("hidden");
+            document.getElementById("worthyText").innerText = `You are officially worthy of being ${userName}'s Valentine! 💖`;
         }
     }
 
